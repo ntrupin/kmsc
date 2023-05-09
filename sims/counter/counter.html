@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script type="text/javascript" src="/static/js/helper.js"></script>
+        <script type="text/javascript" src="counter.js"></script>
+        <link rel="stylesheet" type="text/css" href="counter.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+    </head>
+    <body>
+        {% if version == "display" %}
+        <p>You have clicked the button <b id="counter">0</b> times.</p>
+        {% elif version == "connect" %}
+        <button id="clicker">Click</button>
+        {% endif %}
+    </body>
+</html>

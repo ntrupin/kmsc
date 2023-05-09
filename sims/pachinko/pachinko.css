@@ -1,0 +1,34 @@
+body,canvas{
+	margin:0;
+	padding:0;
+}
+
+canvas {
+	position: absolute;
+	width: 80%;
+	height: 80%;
+	/*margin: auto;*/
+	top: 10%;
+	left: 20%;
+	right: 0;
+}
+
+#description {
+	position:absolute;
+	width: 18%;
+	height: 100%;
+	top: 0;
+	left: 0;
+
+	padding: 0 1%;
+	background-color: tan;
+}
+
+#biasDisplay {
+	position: absolute;
+	width: 10%;
+	/*margin: auto;*/
+	bottom: 1%;
+	left: 21%;
+	right: 0;
+}

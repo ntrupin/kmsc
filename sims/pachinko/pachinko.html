@@ -1,0 +1,42 @@
+<html>
+<head>
+	<title>Pachinko</title>
+	<script type="text/javascript" src="/static/js/helper.js"></script>
+	<link rel="stylesheet" type="text/css" href="pachinko.css">
+	<!-- Include these two lines in every HTML program file -->
+	<link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png">
+	<link rel="icon" href="/favicon.png">
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+</head>
+
+<body>
+	{% if version == "display" %}
+    <div id='description'>
+		<h2>Pachinko</h2>
+		<h4>code written by: Alejandro Turriago Tobón, Class of 2017</h4>
+		<p>"Pachinko" is a game of chance in which falling balls distribute themselves randomly into bins.</p>
+		<p>As the balls fall from the top of the table to the bottom, they come into contact with pegs that cause them to bounce to the left or right. The probability that a ball will bounce to the right is indicated by the "bias" number shown beneath the bins.</p>
+		<ul>
+		<li>Bias = 0.50 means a bounce to the right or left is equally likely.</li>
+		<li>Bias = 1.00 means every bounce will be to the right.</li>
+		<li>Bias = 0.00 means every bounce will be to the left.</li>
+		</ul>
+		<p>As the balls collect in the bins at the bottom, they form a non-uniform shape called a Binomial Distribution. If there were an infinite number of rows (and bins) with a bounce bias of 50% and we allowed an infinite number of balls to fall, the balls would collect in a Normal Distribution.</p>
+	</div>
+	<canvas id="canvas"></canvas>
+	<br>
+	<div id='biasDisplay'><label for='bias'>Bias  </label><button id="bias">0.5</button></div>
+	<script>
+		var bias = Math.floor( Math.random()*100 ) / 100;
+		document.getElementById("bias").innerHTML = bias;
+	</script>
+    <script type="text/javascript" src="pachinko_display.js"></script>
+    {% elif version == "connect" %}
+    <button class="btn" id="inc">+0.05</button>
+    <button class="btn" id="dec">-0.05</button>
+	<button class="btn" id="dump">Dump</button>
+	<button class="btn" id="clear">Clear Bins</button>
+    <script type="text/javascript" src="pachinko_control.js"></script>
+    {% endif %}
+</body>
+</html>

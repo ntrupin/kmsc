@@ -1,0 +1,11 @@
+{
+  "name": "sentinel",
+  "version": "0.0.1",
+  "description": "...",
+  "dependencies": {
+    "express": "^4.18.2",
+    "lowdb": "^6.0.1",
+    "nunjucks": "^3.2.4",
+    "socket.io": "^4.6.1"
+  }
+}

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <style>
+            html {
+                scroll-behavior: smooth;
+                overflow: hidden;
+            }
+            body {
+                margin: 0;
+                padding: 0;
+                width: 100vw;
+                height: 100vh;
+            }
+            div#banner {
+                width: 100%;
+                height: 4vh;
+                text-align: center;
+                vertical-align: middle;
+                line-height: 4vh;
+            }
+            iframe#content {
+                width: 100%;
+                height: 96vh;
+                border: 0;
+            }
+        </style>
+    </head>
+    <body>
+        {% if false %}
+        <h3>KMSC Simulations</h3>
+        <p>Assorted physics simulations and experiments.</p>
+        <ul>
+            {% for sim in sims %}
+            <li><a href="./display/?sim={{ sim }}">{{ sim }}</a></li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <iframe id="content" sandbox="allow-scripts" srcdoc="<script>window.addEventListener('message', e => { if (e.data['reload']) {  document.documentElement.innerHTML = e.data['data']; const loadScripts = (el) => { el.querySelectorAll('script').forEach((oldScript) => { const newScript = document.createElement('script'); Array.from(oldScript.attributes).forEach((attr) => { newScript.setAttribute(attr.name, attr.value); }); const text = document.createTextNode(oldScript.innerHTML); newScript.appendChild(text); oldScript.parentNode.replaceChild(newScript, oldScript); }) }; loadScripts(document.head); loadScripts(document.body); } })</script>"></iframe>
+        <div id="banner"></div>
+        <script src="/socket.io/socket.io.js"></script>
+        <script type="text/javascript">
+            const socket = io();
+            const sims = `{{ sims|join(', ') }}`.split(", ");
+        </script>
+        {% if version == "display" %}
+        <script type="text/javascript" charset="utf-8">
+            const active = "{{ active }}";
+            let did = active != "" ? sims.indexOf(active) : Math.floor(Math.random() * sims.length);
+
+            const getDisplay = (id) => {
+                let sim = sims[id];
+                socket.emit("fetch", sim, "display", (data) => {
+                    document.querySelector("iframe#content").contentWindow.postMessage({ 
+                        reload: true, 
+                        data: `<base href="/${sim}/" />${data}`
+                    }, `*`);
+                });
+            }
+
+            socket.on("connect", () => {
+                const id = `${Math.floor(Math.random() * 1000000)}`.padStart(6, "0");
+                document.querySelector("div#banner").innerHTML = `Connect at /${id}`;
+                socket.emit("join", id);
+                getDisplay(did);
+                socket.on("name_query", (callback) => {
+                    callback(sims[did]);
+                });
+                socket.on("event", data => {
+                    document.querySelector("iframe#content").contentWindow.postMessage(data, "*");
+                });
+            });
+        </script>
+        {% elif version == "connect" %}
+        <script type="text/javascript" charset="utf-8">
+            const room = "{{ room }}";
+            let cid;
+
+            const getConnect = (id) => {
+                let sim = sims[id];
+                socket.emit("fetch", sim, "connect", (data) => {
+                    document.querySelector("iframe#content").contentWindow.postMessage({ 
+                        reload: true, 
+                        data: `<base href="/${sim}/" />${data}`
+                    }, `*`);
+                });
+            }
+
+            socket.on("connect", () => {
+                socket.emit("join", room);
+                socket.emit("name_query", room, (sim) => {
+                    cid = sims.indexOf(sim);
+                    getConnect(cid);
+                });
+            });
+
+            window.addEventListener("message", e => {
+                socket.emit("event", room, e.data);
+            });
+        </script>
+        {% endif %}
+
+        {% endif %}
+        <template id="display">
+            <div id="_internal_content"></div>
+        </template>
+    </body>
+</html>
