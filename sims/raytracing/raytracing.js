@@ -160,15 +160,15 @@ class Entity {
         world.p.line(lx, iy, lfEnd.x, lfEnd.y);
         world.p.line(lx, oy + h, strEnd.x, strEnd.y);
 
-        //result
-        world.p.rect(ix - W / 2, iy - H, W, H);
-        world.p.drawingContext.setLineDash([]);
-
         this.imgx = i;
         this.imgy = H;
         if (this.p < 2) {
             this.p += 0.01;
+        } else if (this.p >= 2) {
+            // result
+            world.p.rect(ix - W / 2, iy - H, W, H);
         }
+        world.p.drawingContext.setLineDash([]);
     }
 }
 
@@ -251,7 +251,6 @@ window.receive(data => {
 
 setInterval(() => {
     if (connected) { return; }
-    console.log("HERE");
     const m = world.selectEntity("main");
     const n = Math.ceil(-(Math.round(Math.random() * 270) + 30) / 5) * 5
     m.moveTo(n);
