@@ -37,8 +37,15 @@
             {% endfor %}
         </ul>
         {% else %}
-        <iframe id="content" sandbox="allow-scripts" srcdoc="<script>window.addEventListener('message', e => { if (e.data['reload']) {  document.documentElement.innerHTML = e.data['data']; const loadScripts = (el) => { el.querySelectorAll('script').forEach((oldScript) => { const newScript = document.createElement('script'); Array.from(oldScript.attributes).forEach((attr) => { newScript.setAttribute(attr.name, attr.value); }); const text = document.createTextNode(oldScript.innerHTML); newScript.appendChild(text); oldScript.parentNode.replaceChild(newScript, oldScript); }) }; loadScripts(document.head); loadScripts(document.body); } })</script>"></iframe>
+        {% if version == "display" %}
         <div id="banner"></div>
+        {% elif version == "connect" %}
+        <button id="prev">Previous Sim</button>
+        <button id="next">Next Sim</button>
+        <button id="refresh">Refresh Sim</button>
+        <hr />
+        {% endif %}
+        <iframe id="content" sandbox="allow-scripts" srcdoc="<script>window.addEventListener('message', e => { if (e.data['reload']) {  document.documentElement.innerHTML = e.data['data']; const loadScripts = (el) => { el.querySelectorAll('script').forEach((oldScript) => { const newScript = document.createElement('script'); Array.from(oldScript.attributes).forEach((attr) => { newScript.setAttribute(attr.name, attr.value); }); const text = document.createTextNode(oldScript.innerHTML); newScript.appendChild(text); oldScript.parentNode.replaceChild(newScript, oldScript); }) }; loadScripts(document.head); loadScripts(document.body); } })</script>"></iframe>
         <script src="/socket.io/socket.io.js"></script>
         <script type="text/javascript">
             const socket = io();
@@ -49,10 +56,23 @@
             const active = "{{ active }}";
             let did = active != "" ? sims.indexOf(active) : Math.floor(Math.random() * sims.length);
 
+            const div = document.querySelector("div#framediv");
+            const template = document.querySelector("template#frame");
+
+            const setParam = (name, value) => {
+                if ("URLSearchParams" in window) {
+                    let params = new URLSearchParams(window.location.search);
+                    params.set(name, value);
+                    let query = window.location.pathname + '?' + params.toString();
+                    history.pushState(null, '', query);
+                }
+            }
+
             const getDisplay = (id) => {
                 let sim = sims[id];
+                const frame = document.querySelector("iframe#content");
                 socket.emit("fetch", sim, "display", (data) => {
-                    document.querySelector("iframe#content").contentWindow.postMessage({ 
+                    frame.contentWindow.postMessage({ 
                         reload: true, 
                         data: `<base href="/${sim}/" />${data}`
                     }, `*`);
@@ -60,7 +80,11 @@
             }
 
             socket.on("connect", () => {
-                const id = `${Math.floor(Math.random() * 1000000)}`.padStart(6, "0");
+                const droom = "{{ droom }}";
+                const id = droom != "" ? droom : `${Math.floor(Math.random() * 1000000)}`.padStart(6, "0");
+
+                setParam("roomID", id);
+
                 document.querySelector("div#banner").innerHTML = `Connect at /${id}`;
                 socket.emit("join", id);
                 getDisplay(did);
@@ -70,11 +94,24 @@
                 socket.on("event", data => {
                     document.querySelector("iframe#content").contentWindow.postMessage(data, "*");
                 });
+                socket.on("refresh", (id) => {
+                    setParam("sim", sims[id % sims.length]);
+                    window.location.reload();
+                });
+                setInterval(() => {
+                    socket.emit("clients", id, (count) => {
+                        if (count <= 1) {
+                            did = (did + 1) % sims.length;
+                            setParam("sim", sims[did]);
+                            window.location.reload();
+                        }
+                    })
+                }, 120000);
             });
         </script>
         {% elif version == "connect" %}
         <script type="text/javascript" charset="utf-8">
-            const room = "{{ room }}";
+            const room = "{{ croom }}";
             let cid;
 
             const getConnect = (id) => {
@@ -97,6 +134,24 @@
 
             window.addEventListener("message", e => {
                 socket.emit("event", room, e.data);
+            });
+
+            document.querySelector("button#prev").addEventListener("click", () => {
+                socket.emit("refresh", room, (cid - 1) % sims.length, () => {
+                    window.location.reload();
+                });
+            });
+
+            document.querySelector("button#next").addEventListener("click", () => {
+                socket.emit("refresh", room, (cid + 1) % sims.length, () => {
+                    window.location.reload();
+                });
+            });
+
+            document.querySelector("button#refresh").addEventListener("click", () => {
+                socket.emit("refresh", room, cid, () => {
+                    window.location.reload();
+                });
             });
         </script>
         {% endif %}

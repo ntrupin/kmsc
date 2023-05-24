@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script type="text/javascript" src="p5.min.js" id="p5js"></script>
+        <script type="text/javascript" src="/static/js/helper.js"></script>
+        {% if version == "display" %}
+        <script type="text/javascript" src="raytracing.js"></script>
+        {% elif version == "connect" %}
+        <script type="text/javascript" src="rt_control.js"></script>
+        {% endif %}
+        <link rel="stylesheet" type="text/css" href="raytracing.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+    </head>
+    <body>
+        {% if version == "display" %}
+        <div id="container" class="container">
+            <div class="sidebar">
+                <h1>Raytracing Simulation</h1>
+                <p>by Noah Trupin '23 for SC535: Honors Physics</p>
+                <p>
+                    <b>References</b>
+                    <ul>
+                        <li><p>Dr. Voss (assorted questions)</p></li>
+                        <li><p><a href="https://p5js.org/">p5.js</a> (rendering)</p></li>
+                    </ul>
+                </p>
+            </div>
+            <div class="stats">
+                <h3>Information</h3>
+                <p>Scale Factor: 1mm/1px</p>
+                <p style="padding-bottom:0;margin-bottom:0;"><b>Key</b></p>
+                <ul style="list-style-position:inside;padding-left:0;margin-top:0;">
+                    <li>Filled Box: Object</li>
+                    <li>Solid Outlined Box: Real Image</li>
+                    <li>Dotted Outlined Box: Virtual Image</li>
+                    <li>Solid Line: Real Ray</li>
+                    <li>Dotted Ray: Virtual Ray</li>
+                </ul>
+                <!--<p>All statistics are rounded to three decimal places.</p>-->
+                <hr />
+                <h3>Statistics</h3>
+                <p>Lens Type: <code id="ltype"></code></p>
+                <p>Focal Length: <code id="fl"></code></p>
+                <p>Object X: <code id="objx"></code></p>
+                <p>Image X: <code id="imgx"></code></p>
+            </div>
+            <div class="graphs"></div>
+        </div>
+        <!--<div id="description">
+            <h2>Unnamed</h2>
+            <h4>code written by: Noah Trupin '23</h4>
+        </div>
+        <canvas width="100vw" height="100vh" id="content"></canvas>-->
+        {% elif version == "connect" %}
+        <p><b>Move object</b></p>
+        <button id="oleft">Left</button>
+        <button id="oright">Right</button>
+        <br />
+        <p><b>Move focal points</b></p>
+        <button id="fldec">Decrease Length</button>
+        <button id="flinc">Increase Length</button>
+        {% endif %}
+    </body>
+</html>

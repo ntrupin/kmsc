@@ -16,11 +16,13 @@ app.use(express.static(__dirname + "/sims"));
 app.use("/static", express.static(__dirname + "/static"));
 
 app.get('/:roomID?', (req, res) => {
-    const room = req.params.roomID;
+    const cid = req.params.roomID;
+    const did = req.query.roomID;
     const sim = req.query.sim;
     const data = {
-        version: room ? "connect" : "display",
-        room: room,
+        version: cid ? "connect" : "display",
+        croom: cid,
+        droom: did,
         sims: fs.readdirSync("./sims"),
         active: sim
     }
@@ -50,11 +52,19 @@ io.on('connection', (socket) => {
             callback(nunjucks.renderString(buffer, data));
         })
     });
+    socket.on("refresh", (room, id, callback) => {
+        io.to(room).emit("refresh", id);
+        callback();
+    });
     socket.on("event", (room, data) => {
         io.to(room).emit("event", data);
     });
+    socket.on("clients", (room, callback) => {
+        const clients = io.sockets.adapter.rooms.get(room);
+        callback(clients ? clients.size : 0);
+    })
     socket.on("disconnect", () => {
-        console.log("user disconnected")
+        console.log("user disconnected");
     })
 });
 

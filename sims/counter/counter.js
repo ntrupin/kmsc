@@ -9,7 +9,8 @@ if (clicker) {
 
 if (counter) {
     let count = 0;
-    receive(data => {
+    console.log("HERE");
+    window.receive(data => {
         if (data == "inc") {
             counter.innerHTML = (++count);
         }

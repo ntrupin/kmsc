@@ -215,7 +215,7 @@ function drawPlatforms() {
 
 play();
 
-receive(data => {
+window.receive(data => {
 	if (data == "inc") {
 		increaseBias();
 	} else if (data == "dec") {
