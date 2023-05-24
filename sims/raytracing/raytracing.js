@@ -140,7 +140,7 @@ class Entity {
         world.p.line(ox, oy, strLxr.x, strLxr.y);
 
         if (i < 0) { 
-            const perpVec = world.p.createVector(5000, 5000*((H + h)/(i - W)));
+            const perpVec = world.p.createVector(5000, 5000*((H + h)/(i)));
             const perpEnd = p5.Vector.lerp(perpMid, perpVec, this.p < 1 ? 0 : this.p - 1);
             const lfVec = world.p.createVector(5000, iy);
             const lfEnd = p5.Vector.lerp(lfMid, lfVec, this.p < 1 ? 0 : this.p - 1);
@@ -209,7 +209,7 @@ let tracer = function(p) {
         world.display();
 
         const lens = world.selectLens(0);
-        qs("#ltype").innerHTML = lens.type;
+        qs("#ltype").innerHTML = lens.fl < 0 ? "Concave" : "Convex";
         qs("#fl").innerHTML = `${lens.fl}mm`;
 
         const entity = world.selectEntity("main");
