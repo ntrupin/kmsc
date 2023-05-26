@@ -121,7 +121,8 @@ class Entity {
         //const hyp = Math.sqrt(Math.pow(i, 2) + Math.pow(H, 2));
         const { x: ox, y: oy } = world.scale({ x: -o, y: this.y });
         const { x: ix, y: iy } = world.scale({ x: i, y: H });
-        const { x: lx, y: _ } = world.scale({ x: lens.x, y: lens.y });
+        const { x: lx, y: ly } = world.scale({ x: lens.x, y: lens.y + (lens.h / 2) });
+        const { x: flx, y: hy } = world.scale({ x: lens.x + lens.fl, y: h - oy });
 
         // perpendicular, left focal, straight
 
@@ -140,7 +141,9 @@ class Entity {
         world.p.line(ox, oy, strLxr.x, strLxr.y);
 
         if (i < 0) { 
-            const perpVec = world.p.createVector(5000, 5000*((H + h)/(i)));
+            //world.p.circle(lx, oy, 20);
+            //world.p.circle(flx, ly, 20);
+            const perpVec = world.p.createVector(250000, 250000*((ly - oy) / (flx - lx)));
             const perpEnd = p5.Vector.lerp(perpMid, perpVec, this.p < 1 ? 0 : this.p - 1);
             const lfVec = world.p.createVector(5000, iy);
             const lfEnd = p5.Vector.lerp(lfMid, lfVec, this.p < 1 ? 0 : this.p - 1);
